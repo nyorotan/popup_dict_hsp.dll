@@ -11,6 +11,7 @@
 #func global _jmdic_load      "jmdic_load"      sptr
 #func global _jmdic_is_loaded "jmdic_is_loaded"
 #func global _jmdic_search    "jmdic_search"    sptr, int, int, int, int
+#func global _jmdic_format    "jmdic_format"    sptr, sptr, int
 #func global _jmdic_free      "jmdic_free"
 #uselib "user32.dll"
 #func global _SetWindowPos "SetWindowPos" sptr, sptr, sptr, sptr, sptr, sptr, sptr
@@ -118,7 +119,6 @@
                 break
             }
         }
-
         dict_lookup v_out, cur_word, 1, alimit
         if stat > 0 {
             found = 1
@@ -347,22 +347,9 @@
         line pop_w - 1, pop_h - 1, 0, pop_h - 1
         line 0, pop_h - 1, 0, 0
 
-        popup_text = ""
-        notesel dict_result
-        repeat notemax
-            noteget line_str, cnt
-            if line_str == "" : continue
-
-            t1 = instr(line_str, 0, "\t")
-            if t1 == -1 : continue
-            d_kanji = strmid(line_str, 0, t1)
-
-            t2 = instr(line_str, t1 + 1, "\t")
-            if t2 == -1 : continue
-            d_kana = strmid(line_str, t1 + 1, t2)
-            d_gloss = strmid(line_str, t1 + 1 + t2 + 1, strlen(line_str))
-            popup_text += d_kanji + " [" + d_kana + "]\n" + d_gloss + "\n\n"
-        loop
+        sdim formatted_result, 16384
+        _jmdic_format varptr(dict_result), varptr(formatted_result), 16384
+        popup_text = formatted_result
         objprm popup_text_obj, popup_text
 
         gsel pop_id, 1

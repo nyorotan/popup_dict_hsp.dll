@@ -188,6 +188,27 @@ func jmdic_search(cKeyword *C.char, exact C.int, limit C.int, outBuf *C.char, ma
 	return copyToCBuf(sb.String(), outBuf, maxLen)
 }
 
+//export jmdic_format
+func jmdic_format(cResults *C.char, outBuf *C.char, maxLen C.int) C.int {
+	if cResults == nil {
+		return 0
+	}
+
+	raw := C.GoBytes(unsafe.Pointer(cResults), C.int(C.strlen(cResults)))
+	results := toUTF8(raw)
+	var sb strings.Builder
+	for _, line := range strings.Split(strings.TrimRight(results, "\r\n"), "\n") {
+		line = strings.TrimSuffix(line, "\r")
+		fields := strings.SplitN(line, "\t", 3)
+		if len(fields) != 3 {
+			continue
+		}
+		fmt.Fprintf(&sb, "%s [%s]\r\n%s\r\n\r\n", fields[0], fields[1], fields[2])
+	}
+
+	return copyToCBuf(sb.String(), outBuf, maxLen)
+}
+
 //export jmdic_free
 func jmdic_free() {
 	dictMu.Lock()

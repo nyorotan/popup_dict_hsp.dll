@@ -89,8 +89,7 @@
     function getCharOffsetAtPoint(textNode, offset, x, y) {
         const text = textNode.textContent;
         const candidates = [offset - 1, offset].filter(index => index >= 0 && index < text.length);
-        let closestOffset = offset;
-        let closestDistance = Infinity;
+        let hitOffset = null;
 
         for (const index of candidates) {
             const range = document.createRange();
@@ -99,16 +98,13 @@
             const rect = range.getBoundingClientRect();
             if (rect.width === 0 && rect.height === 0) continue;
 
-            const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
-            const dy = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0;
-            const distance = dx * dx + dy * dy;
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestOffset = index;
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                hitOffset = index;
+                break;
             }
         }
 
-        return closestOffset;
+        return hitOffset;
     }
 
     // 単語抽出
@@ -144,6 +140,7 @@
 
             let startNode = textNode;
             let startOffset = getCharOffsetAtPoint(textNode, offset, x, y);
+            if (startOffset === null) return null;
             if (insideRubyRt && currentParent && currentParent.parentElement) {
                 // ルビタグ自体ではなく、対応するruby要素全体または次の兄弟ノードを対象に
                 startNode = currentParent.parentElement;
@@ -190,18 +187,6 @@
             }
         }
 
-        const elem = document.elementFromPoint(x, y);
-        if (elem) {
-            // ルビタグとその中身を除去したクローンからテキストを取得
-            const clone = elem.cloneNode(true);
-            const rubies = clone.querySelectorAll("rt, rp");
-            rubies.forEach(el => el.remove());
-            const txt = (clone.innerText || clone.textContent || "").trim();
-            if (txt.length > 0 && txt.length <= 15) {
-                return { word: txt, left: "" };
-            }
-        }
-
         return null;
     }
 
@@ -229,7 +214,7 @@
                             window.chrome.webview.postMessage("DICT_HIDE");
                         }
                         window._hideTimer = null;
-                    }, 1000);
+                    }, 500);
                 }
                 return;
             }
