@@ -36,7 +36,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // Jmdic ポップアップ辞書機能のアタッチ（一行で初期化完了）
+    // Jmdict ポップアップ辞書機能のアタッチ（一行で初期化完了）
     //   dict_attach_webview wv_id, parent_hwnd, msg_id, pop_win_id, csv_path, js_path
     // --------------------------------------------------------------------------
     dict_attach_webview id_wv, hwnd, WM_USER_WV2_MSG, 1, "Jmdict/jmdict_simple.csv", "Jmdict/dict_injector.js"
