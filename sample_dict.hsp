@@ -1,0 +1,127 @@
+// ==============================================================================
+// WebView2 + Jmdic HSP3枠なしウィンドウ辞書ポップアップサンプル (sample_dict.hsp)
+// ==============================================================================
+// 文字コード: Shift-JIS
+// ==============================================================================
+#packopt name "WebView2_dict_sample"
+#include "hsp3webview2.as"
+#include "jmdict.as"
+
+#define WM_USER_WV2_MSG 0x8001
+
+    // --------------------------------------------------------------------------
+    // メインウィンドウ (ID: 0)
+    // --------------------------------------------------------------------------
+    screen 0, 1024, 700
+    title "HSP3 + WebView2 辞書ポップアップ (モジュール化版)"
+
+    // ツールバー
+    objsize 130, 26
+    pos 10, 10  : button gosub "テストHTML読込", *cmd_load_test_html
+    pos 145, 10 : button gosub "青空文庫を開く", *cmd_load_aozora
+    pos 280, 10 : button gosub "再読み込み", *cmd_reload
+    objsize 75, 26
+    pos 420, 10 : button gosub "辞書ON", *cmd_dict_on
+    pos 495, 10 : button gosub "辞書OFF", *cmd_dict_off
+    // WebView2の配置
+    wv_x = 0
+    wv_y = 45
+    wv_w = ginfo_winx
+    wv_h = ginfo_winy - wv_y
+
+    wv2_create id_wv, hwnd, wv_x, wv_y, wv_w, wv_h, 1
+    if id_wv == 0 {
+        dialog "WebView2の初期化に失敗しました。", 1, "エラー"
+        end
+    }
+
+    // --------------------------------------------------------------------------
+    // Jmdic ポップアップ辞書機能のアタッチ（一行で初期化完了）
+    //   dict_attach_webview wv_id, parent_hwnd, msg_id, pop_win_id, csv_path, js_path
+    // --------------------------------------------------------------------------
+    dict_attach_webview id_wv, hwnd, WM_USER_WV2_MSG, 1, "Jmdict/jmdict_simple.csv", "Jmdict/dict_injector.js"
+    dict_enable
+    // ステータス表示
+    font msgothic, 12
+    pos 600, 15
+    color 0, 128, 0 : mes "辞書準備完了！ 単語にマウスを合わせるとポップアップします。"
+
+    // ページ読み込み
+    gosub *cmd_load_test_html
+
+    onexit *on_close
+    stop
+
+// ------------------------------------------------------------------------------
+// サンプルHTMLの読み込み
+// ------------------------------------------------------------------------------
+*cmd_load_test_html
+    dict_hide_popup
+    test_html = {"
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Yu Gothic', Meiryo, sans-serif; line-height: 2; padding: 40px; background: #fafafa; }
+    h1 { color: #333; border-bottom: 2px solid #0078d4; padding-bottom: 8px; }
+    p { font-size: 18px; color: #444; margin-bottom: 24px; }
+    .highlight { background: #e3f2fd; padding: 2px 4px; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
+<body>
+    <h1>Jmdic マウスホバーポップアップテスト</h1>
+    <p>
+        以下の文章の各単語にマウスカーソルを静止させるか、クリックしてみてください。<br>
+        HSP3の枠なしウィンドウで自動ポップアップ表示されます。
+    </p>
+    <p>
+        組み合わせて動作しています。
+        組み合わせて動作しています。<br>
+        <ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>にルビを振る<br>
+        <ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>にルビを振る<br>
+        <ruby>一<rt>いち</rt></ruby><ruby>文字<rt>もじ</rt></ruby>ずつルビを<ruby>振<rt>ふ</rt></ruby>りたい<ruby>場合<rt>ばあい</rt></ruby><br>
+        吾輩は<span class="highlight">猫</span>である。<span class="highlight">名前</span>はまだ無い。<br>
+        どこで生れたかとんと<span class="highlight">見当</span>がつかぬ。<br>
+        何でも薄暗いじめじめした所で<span class="highlight">ニャーニャー</span>泣いていた事だけは記憶している。
+    </p>
+    <p>
+        このシステムは <span class="highlight">Go言語</span> で作成された <span class="highlight">高速辞書</span> DLLと、
+        <span class="highlight">WebView2</span> の JavaScript 連携（<span class="highlight">postMessage</span>）を組み合わせて動作しています。
+    </p>
+</body>
+</html>
+"}
+    wv2_set_html id_wv, test_html
+    return
+
+// ------------------------------------------------------------------------------
+// 青空文庫の読み込み
+// ------------------------------------------------------------------------------
+*cmd_load_aozora
+    dict_hide_popup
+    wv2_navigate id_wv, "https://www.aozora.gr.jp/cards/000148/files/789_14547.html"
+    return
+
+// ------------------------------------------------------------------------------
+// 再読み込み
+// ------------------------------------------------------------------------------
+*cmd_reload
+    dict_hide_popup
+    wv2_reload id_wv
+    return
+
+// ------------------------------------------------------------------------------
+// 終了処理
+// ------------------------------------------------------------------------------
+*on_close
+    wv2_destroy id_wv
+    end
+
+*cmd_dict_on
+    dict_enable
+    return
+
+*cmd_dict_off
+    dict_disable
+    return
