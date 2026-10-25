@@ -7,6 +7,7 @@ package main
 import "C"
 import (
 	"bytes"
+	_ "embed"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -20,6 +21,9 @@ import (
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
 )
+
+//go:embed jmdict_simple.csv
+var jmdictData []byte
 
 // Entry は辞書の1項目を表す構造体
 type Entry struct {
@@ -92,19 +96,23 @@ func copyToCBuf(src string, outBuf *C.char, maxLen C.int) C.int {
 //export jmdict_load
 func jmdict_load(csvPath *C.char) C.int {
 	path := cString(csvPath)
+
+	var reader *csv.Reader
 	if path == "" {
-		path = "jmdict_simple.csv"
+		// 埋め込みデータを使用
+		reader = csv.NewReader(bytes.NewReader(jmdictData))
+	} else {
+		// 外部ファイルを使用
+		file, err := os.Open(path)
+		if err != nil {
+			return -1
+		}
+		defer file.Close()
+		reader = csv.NewReader(file)
 	}
 
-	file, err := os.Open(path)
-	if err != nil {
-		return -1
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
 	// ヘッダー読み飛ばし
-	_, err = reader.Read()
+	_, err := reader.Read()
 	if err != nil {
 		return -2
 	}
@@ -242,7 +250,6 @@ func searchWordParallel(dict *Dictionary, keyword string, exact bool) []Entry {
 			for _, entry := range subEntries {
 				isMatch := false
 				kanjis := strings.Split(entry.Kanji, " / ")
-
 				if exact {
 					for _, k := range kanjis {
 						if strings.TrimSpace(k) == keyword {

@@ -41,13 +41,17 @@
 //   戻り値 : stat > 0 (読み込んだ語数), stat <= 0 (エラー)
 // ------------------------------------------------------------------------------
 #deffunc dict_init str p_path
-    csv_file = p_path
-    if csv_file == "" {
-        csv_file = "Jmdict/jmdict_simple.csv"
+    // 引数が指定されているかチェック
+    if p_path != "" {
+        csv_file = p_path
         exist csv_file
         if strsize == -1 {
-            csv_file = "Jmdict/jmdict_simple.csv"
+            // ファイルが見つからなかった場合のエラー処理
+            dialog "辞書ファイルが見つかりません: " + csv_file, 1, "エラー"
+            return -1
         }
+    } else {
+        csv_file = ""
     }
     _jmdict_load csv_file
     return stat
