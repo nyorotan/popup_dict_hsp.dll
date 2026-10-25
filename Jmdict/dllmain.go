@@ -89,8 +89,8 @@ func copyToCBuf(src string, outBuf *C.char, maxLen C.int) C.int {
 	return C.int(copyLen)
 }
 
-//export jmdic_load
-func jmdic_load(csvPath *C.char) C.int {
+//export jmdict_load
+func jmdict_load(csvPath *C.char) C.int {
 	path := cString(csvPath)
 	if path == "" {
 		path = "jmdict_simple.csv"
@@ -135,8 +135,8 @@ func jmdic_load(csvPath *C.char) C.int {
 	return C.int(count)
 }
 
-//export jmdic_is_loaded
-func jmdic_is_loaded() C.int {
+//export jmdict_is_loaded
+func jmdict_is_loaded() C.int {
 	dictMu.RLock()
 	defer dictMu.RUnlock()
 	if globalDict != nil && len(globalDict.Entries) > 0 {
@@ -145,8 +145,8 @@ func jmdic_is_loaded() C.int {
 	return 0
 }
 
-//export jmdic_search
-func jmdic_search(cKeyword *C.char, exact C.int, limit C.int, outBuf *C.char, maxLen C.int) C.int {
+//export jmdict_search
+func jmdict_search(cKeyword *C.char, exact C.int, limit C.int, outBuf *C.char, maxLen C.int) C.int {
 	dictMu.RLock()
 	dict := globalDict
 	dictMu.RUnlock()
@@ -188,8 +188,8 @@ func jmdic_search(cKeyword *C.char, exact C.int, limit C.int, outBuf *C.char, ma
 	return copyToCBuf(sb.String(), outBuf, maxLen)
 }
 
-//export jmdic_format
-func jmdic_format(cResults *C.char, outBuf *C.char, maxLen C.int) C.int {
+//export jmdict_format
+func jmdict_format(cResults *C.char, outBuf *C.char, maxLen C.int) C.int {
 	if cResults == nil {
 		return 0
 	}
@@ -209,8 +209,8 @@ func jmdic_format(cResults *C.char, outBuf *C.char, maxLen C.int) C.int {
 	return copyToCBuf(sb.String(), outBuf, maxLen)
 }
 
-//export jmdic_free
-func jmdic_free() {
+//export jmdict_free
+func jmdict_free() {
 	dictMu.Lock()
 	globalDict = nil
 	dictMu.Unlock()

@@ -1,22 +1,22 @@
 // ==============================================================================
-// Jmdic モジュール (jmdic.as)
+// Jmdict モジュール (jmdict.as)
 // ==============================================================================
 // 文字コード: Shift-JIS
 // ==============================================================================
-#ifndef __JMDIC_AS__
-#define __JMDIC_AS__
+#ifndef __jmdict_AS__
+#define __jmdict_AS__
 
 
 #uselib "Jmdict/jmdict.dll"
-#func global _jmdic_load      "jmdic_load"      sptr
-#func global _jmdic_is_loaded "jmdic_is_loaded"
-#func global _jmdic_search    "jmdic_search"    sptr, int, int, int, int
-#func global _jmdic_format    "jmdic_format"    sptr, sptr, int
-#func global _jmdic_free      "jmdic_free"
+#func global _jmdict_load      "jmdict_load"      sptr
+#func global _jmdict_is_loaded "jmdict_is_loaded"
+#func global _jmdict_search    "jmdict_search"    sptr, int, int, int, int
+#func global _jmdict_format    "jmdict_format"    sptr, sptr, int
+#func global _jmdict_free      "jmdict_free"
 #uselib "user32.dll"
 #func global _SetWindowPos "SetWindowPos" sptr, sptr, sptr, sptr, sptr, sptr, sptr
 #func global _GetWindowRect "GetWindowRect" sptr, var
-#module mod_jmdic
+#module mod_jmdict
 
 // 辞書機能の有効/無効フラグ
 #define global DICT_ENABLED  1
@@ -49,7 +49,7 @@
             csv_file = "Jmdict/jmdict_simple.csv"
         }
     }
-    _jmdic_load csv_file
+    _jmdict_load csv_file
     return stat
 
 // ------------------------------------------------------------------------------
@@ -57,7 +57,7 @@
 //   戻り値 : 1 (ロード済), 0 (未ロード)
 // ------------------------------------------------------------------------------
 #defcfunc dict_is_ready
-    _jmdic_is_loaded
+    _jmdict_is_loaded
     return stat
 
 // ------------------------------------------------------------------------------
@@ -77,7 +77,7 @@
     max_len = 16384
     sdim v_out, max_len
 
-    _jmdic_search word, exact, alimit, varptr(v_out), max_len
+    _jmdict_search word, exact, alimit, varptr(v_out), max_len
     return stat
 
 // ------------------------------------------------------------------------------
@@ -348,7 +348,7 @@
         line 0, pop_h - 1, 0, 0
 
         sdim formatted_result, 16384
-        _jmdic_format varptr(dict_result), varptr(formatted_result), 16384
+        _jmdict_format varptr(dict_result), varptr(formatted_result), 16384
         popup_text = formatted_result
         objprm popup_text_obj, popup_text
 
@@ -364,9 +364,9 @@
 // ------------------------------------------------------------------------------
 #deffunc dict_cleanup onexit
     // dict_hide_popup
-    _jmdic_free
+    _jmdict_free
     return
 
 #global
 
-#endif // __JMDIC_AS__
+#endif // __jmdict_AS__

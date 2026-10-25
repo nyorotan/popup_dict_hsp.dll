@@ -3,7 +3,7 @@ set GOARCH=386
 set CGO_ENABLED=1
 set CC=i686-w64-mingw32-gcc
 set CXX=i686-w64-mingw32-g++
-go build -buildmode=c-shared -o jmdict.dll
+go build -buildmode=c-shared -trimpath -ldflags="-s -w -linkmode external -extldflags -static" -o jmdict.dll
 
 @REM  set GOARCH=amd64
 @REM  set CGO_ENABLED=1

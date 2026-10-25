@@ -1,4 +1,4 @@
-module webdic/jmdic
+module webdic/jmdict
 
 go 1.27.2
 
