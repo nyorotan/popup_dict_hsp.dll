@@ -1,3 +1,5 @@
+🌐 **English** | [日本語](./README.ja.md)
+
 # popup_dict_hsp.dll
 
 A module that adds dictionary pop-up functionality to the HSP3 `webview2_hsp.dll`. When you hover over text in WebView2, it looks up the word and displays the result in a borderless HSP3 window.
