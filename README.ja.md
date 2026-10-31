@@ -1,3 +1,5 @@
+🌐 [English](./README.md) | **日本語**
+
 # popup_dict_hsp.dll
 
 HSP3 の `webview2_hsp.dll` に辞書ポップアップ機能を追加するモジュールです。WebView2 上の文章にマウスを合わせると単語を検索し、結果を HSP3 の枠なしウィンドウに表示します。
