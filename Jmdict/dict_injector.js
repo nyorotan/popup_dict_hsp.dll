@@ -234,6 +234,17 @@
 
     // クリック時
     document.addEventListener("click", function(e) {
+        if (e.target instanceof Element && e.target.closest("a[href]")) {
+            lastWord = "";
+            if (window._hideTimer) {
+                clearTimeout(window._hideTimer);
+                window._hideTimer = null;
+            }
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage("DICT_HIDE");
+            }
+            return;
+        }
         postDictionaryRequest(getWordAtPoint(e.clientX, e.clientY), e);
     });
 
