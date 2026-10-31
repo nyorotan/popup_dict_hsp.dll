@@ -5,7 +5,7 @@
 // ==============================================================================
 #packopt name "WebView2_dict_sample"
 #include "hsp3webview2.as"
-#include "jmdict.as"
+#include "popup_dict.as"
 
 #define WM_USER_WV2_MSG 0x8001
 

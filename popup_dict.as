@@ -7,7 +7,7 @@
 #define __jmdict_AS__
 
 
-#uselib "Jmdict/jmdict.dll"
+#uselib "Jmdict/popup_dict_hsp.dll"
 #func global _jmdict_load      "jmdict_load"      sptr
 #func global _jmdict_is_loaded "jmdict_is_loaded"
 #func global _jmdict_search    "jmdict_search"    sptr, int, int, int, int
